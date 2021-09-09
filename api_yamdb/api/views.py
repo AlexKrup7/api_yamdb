@@ -23,10 +23,11 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
     pagination_class = LimitOffsetPagination
  
-class PostViewSet(CustomViewSet):
+
+class ReviewViewSet(CustomViewSet):
     serializer_class = ReviewSerializer
     queryset = Review.objects.all()
-
+    
 
 class CommentViewSet(CustomViewSet):
     serializer_class = CommentSerializer

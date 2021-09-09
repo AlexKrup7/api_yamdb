@@ -17,3 +17,13 @@ class User(AbstractUser):
     email = models.EmailField(
         blank=False, unique=True, max_length=254, verbose_name='email address')
     
+
+class UserRole:
+    USER = "user"
+    MODERATOR = "moderator"
+    ADMIN = "admin"
+    choices = (
+        (USER, USER),
+        (MODERATOR, MODERATOR),
+        (ADMIN, ADMIN),
+    )
