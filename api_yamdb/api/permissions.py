@@ -2,7 +2,7 @@ from rest_framework.permissions import (
     SAFE_METHODS,
     BasePermission,
 )
-from users.models import UserRole
+from users.models import User
 
 
 class AdminPermissionOrReadOnly(BasePermission):
@@ -10,6 +10,6 @@ class AdminPermissionOrReadOnly(BasePermission):
         return (
                 request.method in SAFE_METHODS
                 or request.user.is_authenticated
-                and request.user.role == UserRole.ADMIN
+                and request.user.role == User.ADMIN
                 or request.user.is_superuser
         )
