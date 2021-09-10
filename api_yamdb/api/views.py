@@ -1,3 +1,5 @@
+from .mixins import CustomViewSet
+from .serializers import (ReviewSerializer, CommentSerializer)
 import random
 import string
 
@@ -5,6 +7,9 @@ from django.core.mail import send_mail
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from django.shortcuts import get_object_or_404
+from reviews.models import Review, Comment
+from rest_framework import filters, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -74,3 +79,20 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PostViewSet(CustomViewSet):
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
+
+
+class CommentViewSet(CustomViewSet):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        post = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        return Comment.objects.filter(post=post.id)
+
+    def perform_create(self, serializer):
+        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        return serializer.save(author=self.request.user, review=review)
