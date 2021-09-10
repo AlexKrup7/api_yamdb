@@ -1,37 +1,27 @@
-from .mixins import CustomViewSet
-from .serializers import (ReviewSerializer, CommentSerializer)
 import random
 import string
 
 from django.core.mail import send_mail
-from rest_framework import filters, permissions, status, viewsets
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from django.shortcuts import get_object_or_404
-from rest_framework import filters, permissions, viewsets
-from django.db.models import Avg
-from users.models import User
-from .filters import TitlesFilter
-from .serializers import UserSerializer
-
-from .mixins import CustomViewSet
-from .serializers import (ReviewSerializer, CommentSerializer)
-from .permissions import AdminPermissionOrReadOnly
-from rest_framework import mixins, viewsets, filters
-from reviews.models import Category, Genre, Title, Review, Comment
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, \
-    TitleSerializerCreate
-
-from reviews.models import Review, Comment
-from rest_framework import filters, permissions, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
-from .serializers import (RegistrationSerializer, TokenSerializer,
+from .filters import TitlesFilter
+from .mixins import CustomViewSet
+from .permissions import AdminPermissionOrReadOnly
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, RegistrationSerializer,
+                          ReviewSerializer, TitleSerializer,
+                          TitleSerializerCreate, TokenSerializer,
                           UserSerializer)
 
 

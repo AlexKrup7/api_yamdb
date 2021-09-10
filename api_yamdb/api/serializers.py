@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Comment, Review
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import CHOICES, User
-from reviews.models import Category, Genre, Title
+
 
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.ChoiceField(choices=CHOICES, default='user')
