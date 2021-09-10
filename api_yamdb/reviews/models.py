@@ -7,22 +7,22 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 User = get_user_model()
 
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField("", max_length=50)
     slug = models.SlugField(unique=True, default="", db_index=True)
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     name = models.CharField("", max_length=256)
     slug = models.SlugField(unique=True, default="")
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField("", max_length=50)
     year = models.DateField(null=True, blank=True)
-    category = models.ForeignKey(Categories, on_delete=models.SET_NULL,
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  blank=True, null=True)
-    genre = models.ManyToManyField(Genres)
+    genre = models.ManyToManyField(Genre)
     description = models.TextField(blank=True, null=True, max_length=100)
 
     class Meta:
@@ -30,12 +30,12 @@ class Titles(models.Model):
 
     def __str__(self) -> str:
         return self.name
-        
+
 
 class Review(models.Model):
     text = models.TextField()
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='titles')
+        Title, on_delete=models.CASCADE, related_name='titles')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
     score = models.IntegerField(
@@ -48,6 +48,7 @@ class Review(models.Model):
             CheckConstraint(check=Q(score__range=(0, 10)), name='valid_score'),
             UniqueConstraint(fields=['author', 'title'], name='rating_once')
         ]
+
 
 class Comment(models.Model):
     author = models.ForeignKey(
