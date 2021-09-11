@@ -128,7 +128,8 @@ class GenreViewSet(ListCreateDestroyViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    queryset = Title.objects.all()
+    # .annotate(rating=Avg('reviews__score'))
     permission_classes = (AdminPermissionOrReadOnly,)
     http_method_names = ['get', 'post', 'delete', 'patch']
     filterset_class = TitlesFilter
