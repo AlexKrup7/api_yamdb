@@ -1,6 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.utils import timezone
 from users.models import User
 
 
@@ -14,9 +16,15 @@ class Genre(models.Model):
     slug = models.SlugField(unique=True, default="")
 
 
+def year_validator(value):
+    if value > timezone.now().year:
+        raise ValidationError('Ты не пройдешь')
+
+
 class Title(models.Model):
     name = models.CharField("", max_length=50)
-    year = models.DateField(null=True, blank=True)
+    year = models.IntegerField(validators=[year_validator],
+                               null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
                                  blank=True, null=True)
     genre = models.ManyToManyField(Genre)
@@ -32,7 +40,7 @@ class Title(models.Model):
 class Review(models.Model):
     text = models.TextField()
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='titles')
+        Title, on_delete=models.CASCADE, related_name='reviews')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
     score = models.IntegerField(
