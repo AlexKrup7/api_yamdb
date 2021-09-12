@@ -1,20 +1,46 @@
-from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
-from django.core.validators import MinValueValidator, MaxValueValidator
-
-# Create your models here.
-User = get_user_model()
+from django.utils import timezone
+from users.models import User
 
 
-class Titles(models.Model):
-    pass
+class Category(models.Model):
+    name = models.CharField("", max_length=50)
+    slug = models.SlugField(unique=True, default="", db_index=True)
+
+
+class Genre(models.Model):
+    name = models.CharField("", max_length=256)
+    slug = models.SlugField(unique=True, default="")
+
+
+def year_validator(value):
+    if value > timezone.now().year:
+        raise ValidationError('Ты не пройдешь')
+
+
+class Title(models.Model):
+    name = models.CharField("", max_length=50)
+    year = models.IntegerField(validators=[year_validator],
+                               null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
+                                 blank=True, null=True)
+    genre = models.ManyToManyField(Genre)
+    description = models.TextField(blank=True, null=True, max_length=100)
+
+    class Meta:
+        verbose_name = 'Произведение'
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Review(models.Model):
     text = models.TextField()
     title = models.ForeignKey(
-        Titles, on_delete=models.CASCADE, related_name='titles')
+        Title, on_delete=models.CASCADE, related_name='reviews')
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
     score = models.IntegerField(
@@ -27,6 +53,7 @@ class Review(models.Model):
             CheckConstraint(check=Q(score__range=(0, 10)), name='valid_score'),
             UniqueConstraint(fields=['author', 'title'], name='rating_once')
         ]
+
 
 class Comment(models.Model):
     author = models.ForeignKey(
