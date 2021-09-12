@@ -34,9 +34,22 @@ class TokenSerializer(serializers.Serializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field='username', read_only=True)
+    title = SlugRelatedField(slug_field='name', read_only=True)
+    author = SlugRelatedField(
+        slug_field='username', read_only=True,
+        default=serializers.CurrentUserDefault())
+
+    def validate(self, data):
+        request = self.context.get('request')
+        if request.method != 'POST':
+            return data
+        title = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=request.user, title=title).exists():
+            raise serializers.ValidationError('Вы уже оставили отзыв!')
+        return data
 
     class Meta:
+
         fields = '__all__'
         model = Review
 

@@ -1,8 +1,9 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import CheckConstraint, Q, UniqueConstraint
+from django.db.models import CheckConstraint, Q
 from django.utils import timezone
+
 from users.models import User
 
 
@@ -33,33 +34,34 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'Произведение'
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
 class Review(models.Model):
     text = models.TextField()
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews')
+        Title, on_delete=models.CASCADE,
+        related_name='reviews', blank=True, null=True)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='reviews')
+        User, on_delete=models.CASCADE)
     score = models.IntegerField(
         default=1, validators=[MinValueValidator(1), MaxValueValidator(10)])
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        verbose_name='Дата добавления', auto_now_add=True, db_index=True)
 
     class Meta:
+        unique_together = ('title', 'author')
         constraints = [
             CheckConstraint(check=Q(score__range=(0, 10)), name='valid_score'),
-            UniqueConstraint(fields=['author', 'title'], name='rating_once')
         ]
 
 
 class Comment(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
+        User, on_delete=models.CASCADE)
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments')
+        Review, on_delete=models.CASCADE, related_name='comments', null=True)
     text = models.TextField()
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        verbose_name='Дата добавления', auto_now_add=True, db_index=True)

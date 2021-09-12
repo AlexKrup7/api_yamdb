@@ -11,8 +11,9 @@ router_v1.register(r'categories', CategoryViewSet, basename='category')
 router_v1.register(r'titles', TitleViewSet, basename='title')
 router_v1.register(r'titles/(?P<title_id>\d+)/reviews',
                    ReviewViewSet, basename='review')
-router_v1.register(r'titles/(?P<title_id>\d+)/(?P<review_id>\d+)/comments',
-                   CommentViewSet, basename='comment')
+router_v1.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    CommentViewSet, basename='comments')
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),

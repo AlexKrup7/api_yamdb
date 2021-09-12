@@ -16,7 +16,6 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
 from .filters import TitlesFilter
-from .mixins import CustomViewSet
 from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsOwnerOrModeratorOrAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -89,19 +88,26 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReviewViewSet(CustomViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    queryset = Review.objects.all()
     permission_classes = (IsOwnerOrModeratorOrAdminOrReadOnly,)
 
+    def get_queryset(self):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        return title.reviews.all()
 
-class CommentViewSet(CustomViewSet):
+    def perform_create(self, serializer):
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        return serializer.save(author=self.request.user, title=title)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsOwnerOrModeratorOrAdminOrReadOnly,)
 
     def get_queryset(self):
-        post = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        return Comment.objects.filter(post=post.id)
+        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        return Comment.objects.filter(review=review.id)
 
     def perform_create(self, serializer):
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))

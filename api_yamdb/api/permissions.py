@@ -36,6 +36,6 @@ class IsOwnerOrModeratorOrAdminOrReadOnly(BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        return (obj.owner == request.user
+        return (obj.author == request.user or request.user.is_anonymous
                 or (request.user.role in (UserRole.ADMIN, UserRole.MODERATOR)
                     or request.user.is_superuser))
