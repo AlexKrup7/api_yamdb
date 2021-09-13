@@ -23,3 +23,15 @@ class User(AbstractUser):
         blank=False, unique=True, max_length=254, verbose_name='email address')
     confirmation_code = models.CharField(
         blank=True, max_length=10, verbose_name='confirmation code')
+
+    @property
+    def is_user(self):
+        return self.role == UserRole.USER
+
+    @property
+    def is_moderator(self):
+        return self.role == UserRole.MODERATOR
+
+    @property
+    def is_admin(self):
+        return self.role == UserRole.ADMIN or self.is_superuser
