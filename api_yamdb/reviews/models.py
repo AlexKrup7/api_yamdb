@@ -1,6 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import CheckConstraint, Q
+from django.db.models import CheckConstraint, Q, UniqueConstraint
 
 from api.validators import year_validator
 from users.models import User
@@ -42,9 +42,10 @@ class Review(models.Model):
         verbose_name='Дата добавления', auto_now_add=True, db_index=True)
 
     class Meta:
-        unique_together = ('title', 'author')
+        ordering = ['pub_date']
         constraints = [
             CheckConstraint(check=Q(score__range=(0, 10)), name='valid_score'),
+            UniqueConstraint(fields=['author', 'title'], name='rating_once'),
         ]
 
 
