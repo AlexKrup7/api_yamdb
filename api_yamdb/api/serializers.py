@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-
+from rest_framework.validators import UniqueTogetherValidator
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User, UserRole
 
@@ -16,7 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ('username', 'email')
@@ -67,13 +66,27 @@ class CommentSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('name', 'slug')
+        exclude = ['id']
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Category.objects.all(),
+                fields=('name', 'slug'),
+                message='Такая категория уже существует'
+            )
+        ]
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = ('name', 'slug')
+        exclude = ['id']
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Genre.objects.all(),
+                fields=('name', 'slug'),
+                message='Такой жанр уже существует'
+            )
+        ]
 
 
 class TitleSerializer(serializers.ModelSerializer):
