@@ -21,7 +21,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, RegistrationSerializer,
                           ReviewSerializer, TitleSerializer,
                           TitleSerializerCreate, TokenSerializer,
-                          UserSerializer)
+                          UserAdminSerializer, UserSerializer)
 from .utils import get_tokens_for_user
 
 
@@ -60,7 +60,7 @@ class APIToken(APIView):
 class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserAdminSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     pagination_class = LimitOffsetPagination
@@ -71,11 +71,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_info_by_token(self, request):
         if request.method == 'GET':
             serializer = self.get_serializer(request.user)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = UserSerializer(
             request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(role=request.user.role)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
+
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User, UserRole
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserAdminSerializer(serializers.ModelSerializer):
     role = serializers.ChoiceField(
         choices=UserRole.CHOICES, default=UserRole.USER)
 
@@ -13,6 +14,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        read_only_fields = ('role',)
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
